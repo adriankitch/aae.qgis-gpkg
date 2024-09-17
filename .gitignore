@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+gpkg/
+QML_WKSHP/
+R_WKSHP/
+QML/

@@ -20,7 +20,7 @@ layer_param[nrow(layer_param) + 1, ] <- c(918.059, 2431.929, "918 - 2432", "#35b
 layer_param[nrow(layer_param) + 1, ] <- c(2431.929, 6642.130, "2432 - 6642", "#8fd744")
 layer_param[nrow(layer_param) + 1, ] <- c(6642.130, 37809.730, "6642 - 37810", "#fde725")
 
-xml_vector_doc = create_vector_range_classified_qml("HECTARES", layer_param)
+xml_vector_doc = create_vector_range_classified_qml("HECTARES", layer_param, outline_width=0.1, outline_color = "blue")
 
 # SAVE XML TO FILE
 saveXML(xml_vector_doc, file=paste0("QML/", layer_name, "_vector_range_classes.qml"), indent=TRUE)

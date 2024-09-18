@@ -1,18 +1,39 @@
 library(XML)
 library(uuid)
 
-create_vector_range_classified_qml <- function(attribute_name, vector_param, label_attribute = NULL) {
+param_global_default <- list(joinstyle = "bevel",
+                      outline_width_unit = "MM",
+                      outline_width = 0.06,
+                      outline_style = "solid",
+                      outline_color = "35,35,35,255",
+                      style = "solid"
+                      )
+
+update_param_default_to_ellipsis <- function(param_list){
   
-  # <source-symbol>
-  #   <symbol>
-  #     <layer>
-  #       <Option type='Map'>
-  #         <Option type='QString'/>
-  #       </Option>
-  #     </layer>
-  #   </symbol>
-  # </source-symbol>
+  param_default_base = param_global_default
   
+  for(i in 1:length(param_list)){
+    for(j in 1:length(param_default_base)){
+      if(names(param_default_base[j]) == names(param_list[i])){
+        
+        param_default_base[[j]] = param_list[[i]]
+
+      }
+    }
+  }
+  
+  sort_ellipsis <- param_default_base
+  
+}
+
+############# QML BUILD FUNCTIONS #################################################################################
+
+create_vector_range_classified_qml <- function(attribute_name, vector_param, label_attribute = NULL, ...) {
+  
+  param <- list(...)  
+  param <- update_param_default_to_ellipsis(param)
+
   # XML STRING 
   prefix.xml <- "<qgis styleCategories='Symbology|Labeling' version='3.34.8-Prizren'>
                     <renderer-v2>
@@ -38,9 +59,6 @@ create_vector_range_classified_qml <- function(attribute_name, vector_param, lab
                       </settings>
                     </labeling>
                  </qgis>"
-  
-  # prefix.xml <- "<qgis styleCategories='Symbology' version='3.34.8-Prizren'>
-  #               </qgis>"
   
   # file uuid
   guuid = UUIDgenerate() #"9016d819-cfd4-4bd9-89e4-c868788b9e5d" #
@@ -71,49 +89,7 @@ create_vector_range_classified_qml <- function(attribute_name, vector_param, lab
                         lower=vector_param$limit_lower[i]) 
   }
   
-  # source.symbol = newXMLNode("source-symbol", parent=renderer)       
-  # symbol = newXMLNode("symbol", parent=source.symbol)       
-  # xmlAttrs(symbol) = c(type="fill",
-  #                      is_animated="0",
-  #                      frame_rate="10",
-  #                      clip_to_extent="1",
-  #                      alpha="1",
-  #                      name="0",
-  #                      force_rhr="0")           # ADD ATTRIBUTE
-  # 
-  # layer = newXMLNode("layer", parent=symbol)
-  # xmlAttrs(layer) = c(pass="0",
-  #                     id=paste0("{", guuid, "}"),
-  #                     class="SimpleFill",
-  #                     enabled="1",
-  #                     locked="0") 
-  # 
-  # Option_map = newXMLNode("Option", parent=layer)
-  # xmlAttrs(Option_map) = c(type = "Map")
-  # 
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="3x:0,0,0,0,0,0", name="border_width_map_unit_scale")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="0,0,0,255", name="color")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="bevel", name="joinstyle")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="0,0", name="offset")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="3x:0,0,0,0,0,0", name="offset_map_unit_scale")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="MM", name="offset_unit")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="35,35,35,255", name="outline_color")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="solid", name="outline_style")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="0.06", name="outline_width")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="MM", name="outline_width_unit")
-  # Option_QString = newXMLNode("Option", parent=Option_map)
-  # xmlAttrs(Option_QString) = c(type="QString", value="solid", name="style")
-  
+
   symbols = newXMLNode("symbols", parent=renderer)
   for (i in 1:nrow(vector_param)){
     symbol = newXMLNode("symbol", parent=symbols) 
@@ -136,7 +112,17 @@ create_vector_range_classified_qml <- function(attribute_name, vector_param, lab
     Option_QString = newXMLNode("Option", parent=Option_map)
     xmlAttrs(Option_QString) = c(type="QString", value=vector_param$HTMLcolour[i], name="color")
     Option_QString = newXMLNode("Option", parent=Option_map)
-    xmlAttrs(Option_QString) = c(type="QString", value="0.06", name="outline_width")  
+    xmlAttrs(Option_QString) = c(type="QString", value=as.character(param[["outline_width"]]), name="outline_width")
+    Option_QString = newXMLNode("Option", parent=Option_map)    
+    xmlAttrs(Option_QString) = c(type="QString", value=as.character(param[["outline_width_unit"]]), name="outline_width_unit")
+    Option_QString = newXMLNode("Option", parent=Option_map)    
+    xmlAttrs(Option_QString) = c(type="QString", value=as.character(param[["outline_style"]]), name="outline_style")   
+    Option_QString = newXMLNode("Option", parent=Option_map)    
+    xmlAttrs(Option_QString) = c(type="QString", value=as.character(param[["outline_color"]]), name="outline_color")      
+    Option_QString = newXMLNode("Option", parent=Option_map)
+    xmlAttrs(Option_QString) = c(type="QString", value=as.character(param[["joinstyle"]]), name="joinstyle")
+    Option_QString = newXMLNode("Option", parent=Option_map)
+    xmlAttrs(Option_QString) = c(type="QString", value=as.character(param[["style"]]), name="style")
     
   }
   
@@ -360,8 +346,7 @@ create_raster_continuous_qml <- function(min, max, colourRamp){
   
   df <- cbind(class_values, cols)
   df <- as.data.frame(df)
-  # rgb(68, 1, 84, maxColorValue=255)
-  
+
   prefix.xml <- "<qgis maxScale='0' styleCategories='AllStyleCategories' minScale='1e+08' version='3.34.8-Prizren' hasScaleBasedVisibilityFlag='0'>
                     <pipe>
                       <rasterrenderer>
@@ -398,12 +383,8 @@ create_raster_continuous_qml <- function(min, max, colourRamp){
   for (i in 1:nrow(df)){ 
     item = newXMLNode("item", parent=colorrampshader)    
     
-    # if (value_type == "discreet"){
-    #   label_val = as.character(floor(as.double(df$class_values[i])))
-    # } else{
-      label_val = as.character(round(as.double(df$class_values[i]), digits = 0))
-    # }
-    
+    label_val = as.character(round(as.double(df$class_values[i]), digits = 0))
+
     xmlAttrs(item) = c(alpha="255",
                        value=as.character(df$class_values[i]),
                        color=df$cols[i],

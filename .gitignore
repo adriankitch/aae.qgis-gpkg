@@ -49,6 +49,7 @@ po/*~
 rsconnect/
 
 gpkg/*
+!gpkg/qgis_empty.gpkg
 QML_WKSHP/
 R_WKSHP/
 QML/*

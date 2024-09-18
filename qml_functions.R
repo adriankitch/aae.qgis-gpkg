@@ -2,11 +2,13 @@ library(XML)
 library(uuid)
 
 param_global_default <- list(joinstyle = "bevel",
-                      outline_width_unit = "MM",
-                      outline_width = 0.06,
-                      outline_style = "solid",
-                      outline_color = "35,35,35,255",
-                      style = "solid"
+                              outline_width_unit = "MM",
+                              outline_width = 0.06,
+                              outline_style = "solid",
+                              outline_color = "35,35,35,255",
+                              style = "solid",
+                              scaleMax = 100000,
+                              scaleMin = 0
                       )
 
 update_param_default_to_ellipsis <- function(param_list){
@@ -30,6 +32,15 @@ update_param_default_to_ellipsis <- function(param_list){
 ############# QML BUILD FUNCTIONS #################################################################################
 
 create_vector_range_classified_qml <- function(attribute_name, vector_param, label_attribute = NULL, ...) {
+  
+  # INPUT DF FORMAT
+  # vector_param <- data.frame(limit_lower=double(),
+  #                           limit_upper=double(),
+  #                           label=character(),
+  #                           HTMLcolour=character(),
+  #                           stringsAsFactors=FALSE
+  # )  
+  
   
   param <- list(...)  
   param <- update_param_default_to_ellipsis(param)
@@ -149,8 +160,8 @@ create_vector_range_classified_qml <- function(attribute_name, vector_param, lab
                                 bufferNoFill="1")
       rendering = newXMLNode("rendering", parent=settings)
       xmlAttrs(rendering) = c(scaleVisibility="1",
-                                scaleMax="100000",
-                                scaleMin="0")
+                                scaleMax=as.character(param[["scaleMax"]]),
+                                scaleMin=as.character(param[["scaleMin"]]))
     
   }
   
@@ -162,16 +173,13 @@ create_vector_range_classified_qml <- function(attribute_name, vector_param, lab
 }
 
 create_vector_unique_classified_qml <- function(attribute_name, vector_param, label_attribute = NULL) {
-  
-  # <source-symbol>
-  #   <symbol>
-  #     <layer>
-  #       <Option type='Map'>
-  #         <Option type='QString'/>
-  #       </Option>
-  #     </layer>
-  #   </symbol>
-  # </source-symbol>
+
+  # INPUT DF FORMAT  
+  # layer_param <- data.frame(category=character(),
+  #                           label=character(),
+  #                           HTMLcolour=character(),
+  #                           stringsAsFactors=FALSE
+  # )
   
   # XML STRING 
   prefix.xml <- "<qgis styleCategories='Symbology|Labeling' version='3.34.8-Prizren'>
@@ -398,7 +406,14 @@ create_raster_continuous_qml <- function(min, max, colourRamp){
 }
 
 create_raster_unique_classified_colourRamp_qml <- function(class_values, colourRamp){
+
+  # INPUT DF FORMAT
+  # layer_param <- data.frame(class_value=double(),
+  #                           label=character(),
+  #                           stringsAsFactors=FALSE
+  # )  
   
+    
   # class_values <- seq(from = min, to = max, length.out = 255)
   
   if(nrow(class_values) > 255){
@@ -451,6 +466,13 @@ create_raster_unique_classified_colourRamp_qml <- function(class_values, colourR
 
 create_raster_unique_classified_colourDefined_qml <- function(class_values){
   
+  # INPUT DF FORMAT
+  # layer_param <- data.frame(class_value=double(),
+  #                           label=character(),
+  #                           HTMLcolour=character(),
+  #                           stringsAsFactors=FALSE
+  # )  
+  
   # class_values <- seq(from = min, to = max, length.out = 255)
   
   if(nrow(class_values) > 255){
@@ -496,7 +518,7 @@ create_raster_unique_classified_colourDefined_qml <- function(class_values){
   
 }
 
-create_geopackage_style_sql <- function(qml_doc, layer_name){
+build_geopackage_style_sql <- function(qml_doc, layer_name){
   
   create_geopackage_style_sql = paste0('INSERT INTO layer_styles (f_table_name,f_geometry_column,styleName,styleQML,useAsDefault,description,f_table_schema)
     VALUES(

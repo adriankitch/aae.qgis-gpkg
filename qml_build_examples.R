@@ -62,7 +62,7 @@ max = 10
 
 palette <- colorRampPalette(colors=c("#440154", "#443a82", "#31688e", "#21908d", "#35b779", "#8fd744", "#fde725"))
 
-xml_raster_doc = create_raster_continuous_qml(min, max, colourRamp = palette) # default = "continuous"
+xml_raster_doc = create_raster_continuous_qml(min, max, colourRamp = palette)
 
 saveXML(xml_raster_doc, file=paste0("QML/", layer_name, "_raster_continuous.qml"), indent=TRUE)
 

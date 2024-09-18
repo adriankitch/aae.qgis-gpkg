@@ -1,7 +1,11 @@
 library(sf)
 library(RSQLite)
 source("qml_functions.R")
-library(cartography)
+# library(cartography)
+library(mapsf)
+
+
+######### VARIABLES AND SOURCE DATA ###############################################################################
 
 source_gpkg = "gpkg/wetlands2.gpkg"
 
@@ -11,17 +15,20 @@ layer_name = "WETLAND_CURRENT"
 map_attribute = "HECTARES"
 label_attribute = "WETLAND_NO"
 
+# Load source layer into R
 wetlands <- st_read(source_gpkg, layer = layer_name)
 
-
+# Copy gpkg template
 file.copy(from = template_gpkg, new_gpkg)
 conn <- dbConnect(SQLite(), new_gpkg)
 
+# write source layer to new gpkg
 sf::st_write(wetlands, layer = layer_name, new_gpkg, append=FALSE)
 
 ######################################################################################################################
+########################## DEFINE QML STYLE INPUTS  ##################################################################
 
-wBreaks <-  as.data.frame(getBreaks(v = wetlands$HECTARES, nclass = 6, method = "kmeans"))
+wBreaks <-  as.data.frame(getBreaks(v = wetlands[[map_attribute]], nclass = 6, method = "kmeans"))
 colnames(wBreaks) <- "class"
 # min_val = min(wetlands$HECTARES)
 # max_val = max(wetlands$HECTARES)
@@ -44,6 +51,7 @@ for(i in 1:(nrow(wBreaks)-1)){
 }
 
 ######################################################################################################################
+############################### BUILD QML AND SAVE TO CML DOC ########################################################
 
 xml_vector_doc = create_vector_range_classified_qml(map_attribute, layer_param, label_attribute)
 
@@ -51,11 +59,11 @@ xml_vector_doc = create_vector_range_classified_qml(map_attribute, layer_param, 
 saveXML(xml_vector_doc, file=paste0("QML/", layer_name, "_vector_range_classesv2.qml"), indent=TRUE)
 
 ######################################################################################################################
-
+############################### SAVE QML STYLE TO GEOPACKAGE #########################################################
 
 out_xml = saveXML(xml_vector_doc, file=NULL, indent=TRUE)
 
-dbExecute(conn, create_geopackage_style_sql(out_xml, layer_name))
+dbExecute(conn, build_geopackage_style_sql(out_xml, layer_name))
 
 dbDisconnect(conn)
 

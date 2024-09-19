@@ -17,13 +17,16 @@ update_param_default_to_ellipsis <- function(param_list){
   
   param_default_base = param_global_default
   
-  for(i in 1:length(param_list)){
-    for(j in 1:length(param_default_base)){
-      if(names(param_default_base[j]) == names(param_list[i])){
+  if(length(param_list) > 0)
+  {
+    for(i in 1:length(param_list)){
+      for(j in 1:length(param_default_base)){
+        if(names(param_default_base[j]) == names(param_list[i])){
         
-        param_default_base[[j]] = param_list[[i]]
+          param_default_base[[j]] = param_list[[i]]
 
       }
+    }
     }
   }
   

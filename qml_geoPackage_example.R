@@ -28,7 +28,7 @@ sf::st_write(wetlands, layer = layer_name, new_gpkg, append=FALSE)
 ######################################################################################################################
 ########################## DEFINE QML STYLE INPUTS  ##################################################################
 
-wBreaks <-  as.data.frame(getBreaks(v = wetlands[[map_attribute]], nclass = 6, method = "kmeans"))
+wBreaks <-  as.data.frame(mf_get_breaks(x = wetlands[[map_attribute]], nbreaks = 6, breaks = "kmeans"))
 colnames(wBreaks) <- "class"
 # min_val = min(wetlands$HECTARES)
 # max_val = max(wetlands$HECTARES)

@@ -8,7 +8,9 @@ param_global_default <- list(joinstyle = "bevel",
                               outline_color = "35,35,35,255",
                               style = "solid",
                               scaleMax = 100000,
-                              scaleMin = 0
+                              scaleMin = 0,
+                              bufferColor="white",
+                              bufferSize=1                            
                       )
 
 update_param_default_to_ellipsis <- function(param_list){
@@ -153,8 +155,8 @@ create_vector_range_classified_qml <- function(attribute_name, vector_param, lab
                              )
       text.buffer = newXMLNode("text-buffer", parent=text.style)
       xmlAttrs(text.buffer) = c(bufferOpacity="1",
-                                bufferColor="250,250,250,255",
-                                bufferSize="1",
+                                bufferColor=as.character(param[["bufferColor"]]),
+                                bufferSize=as.character(param[["bufferSize"]]),
                                 bufferJoinStyle="128",
                                 bufferDraw="1",
                                 bufferNoFill="1")

@@ -31,7 +31,11 @@ update_param_default_to_ellipsis <- function(param_list){
   
 }
 
+###################################################################################################################
 ############# QML BUILD FUNCTIONS #################################################################################
+###################################################################################################################
+
+############# VECTOR FUNCTIONS #################################################################################
 
 create_vector_range_classified_qml <- function(attribute_name, vector_param, label_attribute = NULL, ...) {
   
@@ -348,6 +352,8 @@ create_vector_unique_classified_qml <- function(attribute_name, vector_param, la
   
 }
 
+############# RASTER FUNCTIONS #################################################################################
+
 create_raster_continuous_qml <- function(min, max, colourRamp){
   
   class_values <- seq(from = min, to = max, length.out = 255)
@@ -519,6 +525,8 @@ create_raster_unique_classified_colourDefined_qml <- function(class_values){
   create_raster_unique_classified_colourRamp_qml = doc
   
 }
+
+############# OTHER FUNCTIONS #################################################################################
 
 build_geopackage_style_sql <- function(qml_doc, layer_name){
   

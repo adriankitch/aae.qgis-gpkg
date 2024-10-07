@@ -13,7 +13,7 @@ param_global_default <- list(joinstyle = "bevel",
                               bufferSize=1                            
                       )
 
-update_param_default_to_ellipsis <- function(param_list){
+update_param_default_to_ellipsis_DEP <- function(param_list){
   
   param_default_base = param_global_default
   
@@ -32,6 +32,23 @@ update_param_default_to_ellipsis <- function(param_list){
   
   sort_ellipsis <- param_default_base
   
+}
+
+update_param_default_to_ellipsis <- function(param_list) {
+  param_default_base <- param_global_default
+  
+  if (length(param_list) > 0) {
+    param_names <- names(param_list)
+    default_names <- names(param_default_base)
+    
+    matched_indices <- match(param_names, default_names)
+    matched_indices <- matched_indices[!is.na(matched_indices)]
+    
+    param_default_base[matched_indices] <- param_list[!is.na(matched_indices)]
+  }
+  
+  sort_ellipsis <- param_default_base
+  return(sort_ellipsis)
 }
 
 ###################################################################################################################
